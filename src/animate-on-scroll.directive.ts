@@ -79,6 +79,7 @@ export class AnimateOnScrollDirective implements OnInit, OnDestroy {
     if(undefined!==this.animateResetTime && 0<this.animateResetTime){
       setTimeout(()=>{
           this.removeClass(this.animationName);
+          this.isVisible=false;
       },this.animateResetTime);
     }
   }
