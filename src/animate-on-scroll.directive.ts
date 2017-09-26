@@ -1,4 +1,4 @@
-import { Directive, Input, Renderer, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Directive, Input, Renderer,Renderer2, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { ScrollService } from './scroll.service';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/takeUntil';
@@ -14,8 +14,9 @@ export class AnimateOnScrollDirective implements OnInit, OnDestroy {
   private ngUnsubscribe: Subject<void> = new Subject<void>();
 
   @Input() animationName: string; // use fadeIn as default if not specified
+  @Input() animateResetTime:number;// miliseconds after which class should be removed . if not set , wont repeat animation.
 
-  constructor(private elementRef: ElementRef, private renderer: Renderer, private scroll: ScrollService) { }
+  constructor(private elementRef: ElementRef, private renderer: Renderer, private scroll: ScrollService , private renderer2: Renderer2) { }
 
   ngOnInit(): void {
 
@@ -75,6 +76,11 @@ export class AnimateOnScrollDirective implements OnInit, OnDestroy {
 
     // use default for animate.css if no value provided
     this.setClass(this.animationName);
+    if(undefined!==this.animateResetTime && 0<this.animateResetTime){
+      setTimeout(()=>{
+          this.removeClass(this.animationName);
+      },this.animateResetTime);
+    }
   }
 
   /**
@@ -84,7 +90,18 @@ export class AnimateOnScrollDirective implements OnInit, OnDestroy {
    * @returns void
    */
   private setClass(classname: string): void {
-    this.renderer.setElementClass(this.elementRef.nativeElement, classname, true);
+    this.renderer2.addClass(this.elementRef.nativeElement,classname);
+    // this.renderer.setElementClass(this.elementRef.nativeElement, classname, true);
+  }
+
+/**
+   * utility function to remove css class to element in DOM
+   * 
+   * @param  {string} classname
+   * @returns void
+   */
+  private removeClass(classname: string): void {
+    this.renderer2.removeClass(this.elementRef.nativeElement,classname);
   }
 
   /**
